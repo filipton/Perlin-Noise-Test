@@ -13,7 +13,7 @@ public class ChunkLoaderAgent : MonoBehaviour
 
     [Header("References")]
     public ChunkGenerator Generator;
-    public List<Chunk> DynamicLoadedChunks = new List<Chunk>();
+    //public List<Chunk> DynamicLoadedChunks = new List<Chunk>();
 
     [Header("Percentage")]
     public Slider PercSlider;

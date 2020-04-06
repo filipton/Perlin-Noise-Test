@@ -11,6 +11,8 @@ public class BlockInteract : MonoBehaviour
     public GameObject BreakBlock;
     public GameObject PlaceBlock;
 
+    public int SetBlockBlock;
+
     public float BreakingTime;
     public float MaxBreakingTime = 1;
 
@@ -87,15 +89,17 @@ public class BlockInteract : MonoBehaviour
 
                     Generator.Chunks.Add(chunk);
 
+                    //Generator.GenerateChunkAt((int)ChunkCoords.x, (int)ChunkCoords.y, (int)ChunkCoords.z, chunk, Generator.chunkSize);
+
                     chunk.ChunkX = (int)ChunkCoords.x;
                     chunk.ChunkY = (int)ChunkCoords.y;
                     chunk.ChunkZ = (int)ChunkCoords.z;
 
-                    chunk.SetBlock(px, py, pz, 1);
+                    chunk.SetBlock(px, py, pz, SetBlockBlock);
                 }
                 else
                 {
-                    c.SetBlock(px, py, pz, 1);
+                    c.SetBlock(px, py, pz, SetBlockBlock);
                 }
             }
         }

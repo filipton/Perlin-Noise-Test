@@ -27,9 +27,7 @@ public class ChunkGenerator : MonoBehaviour
     public List<Chunk> Chunks = new List<Chunk>();
 
     [Header("GameObjects And Other")]
-    public Material material;
-    public Material material1;
-    public Material material2;
+    public Material[] Mats;
     public GameObject CubePrefab;
     public GameObject ChunkPrefab;
     public GameObject ChunksParent;

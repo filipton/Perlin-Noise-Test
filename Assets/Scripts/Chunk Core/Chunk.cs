@@ -60,39 +60,60 @@ public class Chunk : MonoBehaviour
 
     public void GenerateChunk(ChunkMesh chunkMesh)
     {
-        #region Create Mesh
+        Transform container = this.transform;
+        GameObject combinedObj = new GameObject("All Combines");
 
-        //the creation of the final mesh from the data.
+        combinedObj.transform.parent = container;
+        combinedObj.layer = 8;
 
-        Transform container = this.transform;//create container object
-        GameObject stone = new GameObject("Stone Mesh");//create gameobject for the mesh
-        stone.transform.parent = container;//set parent to the container we just made
-        MeshFilter stonemf = stone.AddComponent<MeshFilter>();//add mesh component
-        MeshRenderer stonemr = stone.AddComponent<MeshRenderer>();//add mesh renderer component
-        stonemr.material = Generator.material;//set material to avoid evil pinkness of missing texture
-        stonemf.mesh.CombineMeshes(chunkMesh.Stone.ToArray());//set mesh to the combination of all of the blocks in the list
-        stone.AddComponent<MeshCollider>().sharedMesh = stonemf.sharedMesh;//setting colliders takes more time. disabled for testing.
-        stone.layer = 8;
+        MeshFilter mf = combinedObj.AddComponent<MeshFilter>();
 
-        GameObject iron = new GameObject("Iron Mesh");//create gameobject for the mesh
-        iron.transform.parent = container;//set parent to the container we just made
-        MeshFilter ironmf = iron.AddComponent<MeshFilter>();//add mesh component
-        MeshRenderer ironmr = iron.AddComponent<MeshRenderer>();//add mesh renderer component
-        ironmr.material = Generator.material1;//set material to avoid evil pinkness of missing texture
-        ironmf.mesh.CombineMeshes(chunkMesh.Iron.ToArray());//set mesh to the combination of all of the blocks in the list
-        iron.AddComponent<MeshCollider>().sharedMesh = ironmf.sharedMesh;//setting colliders takes more time. disabled for testing.
-        iron.layer = 8;
+        MeshRenderer mr = combinedObj.AddComponent<MeshRenderer>();//add mesh renderer component
+        List<Material> Mats = new List<Material>();
 
-        GameObject gold = new GameObject("Gold Mesh");//create gameobject for the mesh
-        gold.transform.parent = container;//set parent to the container we just made
-        MeshFilter goldmf = gold.AddComponent<MeshFilter>();//add mesh component
-        MeshRenderer goldmr = gold.AddComponent<MeshRenderer>();//add mesh renderer component
-        goldmr.material = Generator.material2;//set material to avoid evil pinkness of missing texture
-        goldmf.mesh.CombineMeshes(chunkMesh.Gold.ToArray());//set mesh to the combination of all of the blocks in the list
-        gold.AddComponent<MeshCollider>().sharedMesh = goldmf.sharedMesh;//setting colliders takes more time. disabled for testing.
-        gold.layer = 8;
 
-        #endregion
+        //First we need to combine the wood into one mesh and then the leaf into one mesh
+        Mesh combinedStoneMesh = new Mesh();
+        combinedStoneMesh.CombineMeshes(chunkMesh.Stone.ToArray());
+
+        Mesh combinedIronMesh = new Mesh();
+        combinedIronMesh.CombineMeshes(chunkMesh.Iron.ToArray());
+
+        Mesh combinedGoldMesh = new Mesh();
+        combinedGoldMesh.CombineMeshes(chunkMesh.Gold.ToArray());
+
+        //Create the array that will form the combined mesh
+        List<CombineInstance> totalMesh = new List<CombineInstance>();
+        //CombineInstance[] totalMesh = new CombineInstance[3];
+
+        //Add the submeshes in the same order as the material is set in the combined mesh
+        if(combinedStoneMesh.vertexCount > 0)
+        {
+            totalMesh.Add(new CombineInstance() { mesh = combinedStoneMesh, transform = combinedObj.transform.localToWorldMatrix });
+            Mats.Add(Generator.Mats[0]);
+        }
+        if(combinedIronMesh.vertexCount > 0)
+        {
+            totalMesh.Add(new CombineInstance() { mesh = combinedIronMesh, transform = combinedObj.transform.localToWorldMatrix });
+            Mats.Add(Generator.Mats[1]);
+        }
+        if(combinedGoldMesh.vertexCount > 0)
+        {
+            totalMesh.Add(new CombineInstance() { mesh = combinedGoldMesh, transform = combinedObj.transform.localToWorldMatrix });
+            Mats.Add(Generator.Mats[2]);
+        }
+
+        //mr.materials = Mats.ToArray();
+        mr.sharedMaterials = Mats.ToArray();
+
+        //Create the final combined mesh
+        Mesh combinedAllMesh = new Mesh();
+
+        //Make sure it's set to false to get 2 separate meshes
+        combinedAllMesh.CombineMeshes(totalMesh.ToArray(), false);
+        combinedObj.GetComponent<MeshFilter>().mesh = combinedAllMesh;
+
+        combinedObj.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;
     }
 
     public void GenerateChunkByListOfBlock()
@@ -102,11 +123,12 @@ public class Chunk : MonoBehaviour
         List<CombineInstance> GoldblockData = new List<CombineInstance>();//this will contain the data for the final mesh
         MeshFilter blockMesh = Instantiate(Generator.CubePrefab, Vector3.zero, Quaternion.identity).GetComponent<MeshFilter>();
 
+
         foreach (Block b in blocksInChunk)
         {
             blockMesh.transform.position = new Vector3(b.x, b.y, b.z);//move the unit cube to the intended position
 
-            if(b.BlockID == 1 && b.Visible)
+            if (b.BlockID == 1 && b.Visible)
             {
                 CombineInstance ci = new CombineInstance
                 {//copy the data off of the unit cube
@@ -115,7 +137,7 @@ public class Chunk : MonoBehaviour
                 };
                 StoneblockData.Add(ci);//add the data to the list
             }
-            else if(b.BlockID == 2 && b.Visible)
+            else if (b.BlockID == 2 && b.Visible)
             {
                 CombineInstance ci = new CombineInstance
                 {//copy the data off of the unit cube
@@ -165,7 +187,11 @@ public class Chunk : MonoBehaviour
         block = DeleteBlock(x, y, z);
 
         Block b = new Block(blockID, x, y, z);
-        blocksInChunk.Add(b);
+
+        if (blockID != 0)
+        {
+            blocksInChunk.Add(b);
+        }
 
         CubeSaver.Instance.SaveChangedBlock(b);
 

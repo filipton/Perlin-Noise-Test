@@ -581,9 +581,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   Chunks: []
-  material: {fileID: 2100000, guid: 03a0ff10e3232a043a831933129e21b0, type: 2}
-  material1: {fileID: 2100000, guid: c5e6ad93b0171ea43ba5b2d538edda03, type: 2}
-  material2: {fileID: 2100000, guid: 484ff26eca4ca43498febe7c01ef3711, type: 2}
+  Mats:
+  - {fileID: 2100000, guid: 03a0ff10e3232a043a831933129e21b0, type: 2}
+  - {fileID: 2100000, guid: c5e6ad93b0171ea43ba5b2d538edda03, type: 2}
+  - {fileID: 2100000, guid: 484ff26eca4ca43498febe7c01ef3711, type: 2}
   CubePrefab: {fileID: 4383662738000394018, guid: 03f952de42e202943bf7ac90d1719e0a,
     type: 3}
   ChunkPrefab: {fileID: 6257058660938382224, guid: a0567b766d71a584fadfe590d448703c,
